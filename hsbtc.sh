@@ -160,7 +160,7 @@ import_seed(){
         mpkey=`echo $btcnewseed | sx mpk`  #bug libbitcoin -> return 0 when the correct is 1 (error exit 1) --> FIXED BY GENJIX <--
         if test $? = 0 ; then 
             cat $STRGFILES/step2
-            echo $btcnewwseed $mpkey
+            echo $btcnewseed $mpkey
             cat $STRGFILES/step3
             sleep 2
             checkgpg
