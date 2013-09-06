@@ -25,18 +25,27 @@
 # Edit next line if your router is on the same subnet,
 # e.g. 192.168.10.X
 #
+# Dharma
+# Fuente: http://chrisjrob.com/2011/03/14/sharing-a-wireless-connection-via-ethernet-port/
 
-        set -e
-	if [ "$(id -u)" != "0" ]; then
-	    echo "Error: This script must be run as root." 1>&2
-	    echo
-	    echo "  $ sudo wireless2wired start|stop|reload|help" 1>&2
-	    echo
-	    exit 1
-        if
+help(){
+       echo
+       echo " [+] wirelles2wired help:"
+       echo
+       echo " start - Set up dnsmasq service, kernel route and firewall"
+       echo " redirect to share the wirelles conection across the wired"
+       echo " conection using a cable."
+       echo
+       echo " stop - stop dnsmasq and flush file configuration."
+       echo
+       echo " reload - stop and restart the script"
+       echo
+}
+
 
 clean(){
         cat /dev/null > /etc/dnsmasq.conf
+        service dnsmasq stop
         service firewall reload
         #remove route 192.168.10    
 }
@@ -50,16 +59,19 @@ wireless2wired(){
 	iptables -F FORWARD
 	iptables -A FORWARD -j ACCEPT
         echo
+        echo "[+] Restarting dnsmasq:"
+        echo
 	service dnsmasq restart
         echo
         echo " [+] Firewall Status:"
-	iptables -nvL
         echo
-        echo " [+] DNSMasq config:"
+	iptables -nvL | ccze -A
+        echo
+        echo " [+] DNSMasq config status:"
         echo
 	cat /etc/dnsmasq.conf | ccze -A
         echo
-        echo " [+] Routes:"
+        echo " [+] Routes status:"
         echo
 	route -n
         echo
@@ -69,25 +81,18 @@ wireless2wired(){
 }
 
 ready(){
-	    SUBNET=192.168.10
-            sleep 0.3
-            wirelles2wired
+        SUBNET=192.168.10
+        sleep 0.3
+        wirelles2wired
 }
 
 	case "$1" in
         "start") ready ; wireless2wired ;;
         "reaload") stop ; start ;; 
         "stop") clean ;;
+        "help") help ;;
         "*") echo " Please, run wireless2wired start|stop|restart"
         esac
 
 
 
-# Now your friend should be able to check, see the syslog,get an IP 
-# through a cable between your computer and hers, and use your 
-# wireless connection.
-#
-# When you finish the conection, reboot your computer. 
-#
-# Dharma
-# Fuente: http://chrisjrob.com/2011/03/14/sharing-a-wireless-connection-via-ethernet-port/

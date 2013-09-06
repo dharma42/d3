@@ -1,73 +1,56 @@
 #!/bin/bash
-
-iniciar(){
-
-# Abre para a faixa de endereços da rede local:
-
+#
+# Designed for a fairly standard Debian/Ubuntu desktop system
+# Version 0.01-aug20013 (test)
+# Requires ccze
+# <sudo apt-get install ccze>
+#
+# dharma
+#
+set -e
+echo
+if [ "$(id -u)" != "0" ]; then
+    echo "Error: This script must be run as root." 1>&2
+    echo
+    echo "  $ sudo service firewall start|stop|reload" 1>&2
+    echo
+    exit 1
+fi
+echo Setting up rules:
+ready(){
+iptables --policy INPUT DROP
+#iptables --policy FORWARD DROP
 iptables -A INPUT -i lo -j ACCEPT
-
 iptables -A INPUT -p tcp --syn -j DROP
-
-# Faz a mesma coisa, só que especificando a interface. Pode ser
-
-# usada em substituição à regra anterior:
-
-# iptables -A INPUT -i eth0 -j ACCEPT
-
-# Abre uma porta (inclusive para a Internet):
-
-iptables -A INPUT -p tcp --dport 22 -j DROP
-
-# Ignora pings:
-
 iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
-
-# Protege contra IP spoofing:
-
 echo 1 > /proc/sys/net/ipv4/conf/default/rp_filter
-
-# Descarta pacotes malformados, protegendo contra ataques diversos:
-
 iptables -A INPUT -m state --state INVALID -j DROP
-
-# Abre para a interface de loopback. Esta regra é essencial para que
-
-# o KDE e outros programas gráficos funcionem adequadamente:
-
-iptables -A INPUT -i lo -j ACCEPT
-
-# Impede a abertura de novas conexões, efetivamente bloqueando o acesso
-
-# externo ao seu servidor, com exceção das portas e faixas de endereços
-
-# especificadas anteriormente:
-
-iptables -A INPUT -p tcp --syn -j DROP
-
-echo "Regras de firewall ativadas"
-
+iptables -A INPUT -p tcp -m tcp --dport 101 --syn -j ACCEPT
+iptables --policy OUTPUT ACCEPT
+iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+iptables --append INPUT --jump DROP
+#iptables --append FORWARD --jump DROP
+#iptables --policy OUTPUT DROP
+iptables --append OUTPUT --protocol udp --match multiport --dports domain,bootps --jump ACCEPT
+iptables --append OUTPUT --protocol tcp --match multiport --dports domain,http,https,ssh,pop3s,imaps,submission --jump ACCEPT
+echo "Firewall rules up"
+iptables -L | ccze -A
 }
-
-parar(){
-
+stop(){
 iptables -F
-
 iptables -P INPUT ACCEPT
-
 iptables -P OUTPUT ACCEPT
-
-echo "Regras de firewall desativadas"
-
+echo "Firewall rules down"
 }
 
 case "$1" in
 
-"start") iniciar ;;
+"start") ready ;;
 
-"stop") parar ;;
+"stop") stop ;;
 
-"restart") parar; iniciar ;;
+"reload") stop; ready ;;
 
-*) echo "Use os parâmetros start ou stop"
+*) echo "Use start|stop|reload options"
 
 esac
