@@ -33,8 +33,8 @@ help(){
        echo " [+] wirelles2wired help:"
        echo
        echo " start - Set up dnsmasq service, kernel route and firewall"
-       echo " redirect to share the wirelles conection across the wired"
-       echo " conection using a cable."
+       echo " redirect to share the wirelles conection between 2 computers"
+       echo " across the wired conection using a cable."
        echo
        echo " stop - stop dnsmasq and flush file configuration."
        echo
