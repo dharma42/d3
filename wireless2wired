@@ -46,8 +46,8 @@ help(){
 clean(){
         cat /dev/null > /etc/dnsmasq.conf
         service dnsmasq stop
+        #add here a command line to remove route 192.168.10    
         service firewall reload
-        #remove route 192.168.10    
 }
 
 wireless2wired(){
@@ -91,7 +91,7 @@ ready(){
         "reaload") stop ; start ;; 
         "stop") clean ;;
         "help") help ;;
-        "*") echo " Please, run: <sudo wireless2wired start|stop|restart|help>"
+        *) echo " Please, run: <sudo wireless2wired start|stop|restart|help>"
         esac
 
 
