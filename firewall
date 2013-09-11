@@ -6,22 +6,28 @@
 # Requires ccze
 # <sudo apt-get install ccze>
 #
-# Put the script in /etc/init.d and run:
+# Put this script in /etc/init.d and run the following command line
+# to modify the file /etc/init.d/rc.local and execute the script 
+# like a service at the next boot:
 # <sudo echo service firewall start >> /etc/init.d/rc.local>
+#
+# To run this script use:
+# <sudo service firewall start|stop|reload>
 # 
 # dharma
 #
 	set -e
 	echo
 	if [ "$(id -u)" != "0" ]; then
-	    echo "Error: This script must be run as root." 1>&2
+	    echo " [+] Error: This script must be run as root." 1>&2
 	    echo
 	    echo "  $ sudo service firewall start|stop|reload" 1>&2
 	    echo
 	    exit 1
 	fi
-	echo Setting up rules:
-	
+	echo " [+] Setting up rules:"
+	echo
+
 ready(){
 	iptables --policy INPUT DROP
 	#iptables --policy FORWARD DROP
@@ -38,20 +44,24 @@ ready(){
 	#iptables --policy OUTPUT DROP
 	iptables --append OUTPUT --protocol udp --match multiport --dports domain,bootps --jump ACCEPT
 	iptables --append OUTPUT --protocol tcp --match multiport --dports domain,http,https,ssh,pop3s,imaps,submission --jump ACCEPT
-	echo "Firewall rules up"
+	echo " [+] Firewall rules up:"
+        echo
 	iptables -L | ccze -A
+        echo
 }
 
 stop(){
 	iptables -F
 	iptables -P INPUT ACCEPT
 	iptables -P OUTPUT ACCEPT
-	echo "Firewall rules down"
+        echo
+	echo " [+] Firewall rules down:"
+        echo
 }
 
 	case "$1" in
 	"start") ready ;;
 	"stop") stop ;;
 	"reload") stop; ready ;;
-	*) echo "Use start|stop|reload options"
+	*) echo " --> Use start|stop|reload options"
 	esac
