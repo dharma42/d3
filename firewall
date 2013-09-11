@@ -7,8 +7,8 @@
 # <sudo apt-get install ccze>
 #
 # Put this script in /etc/init.d and run the following command line
-# to modify the file /etc/init.d/rc.local and execute the script 
-# like a service at the next boot:
+# to modify /etc/init.d/rc.local and execute the script like a 
+# service at the next boot:
 # <sudo echo service firewall start >> /etc/init.d/rc.local>
 #
 # To run this script use:
