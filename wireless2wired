@@ -91,7 +91,7 @@ ready(){
         "reaload") stop ; start ;; 
         "stop") clean ;;
         "help") help ;;
-        *) echo " Please, run: <sudo wireless2wired start|stop|restart|help>"
+        *) echo " Please, run: <sudo wireless2wired start|stop|reload|help>"
         esac
 
 
